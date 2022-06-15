@@ -1,0 +1,42 @@
+---
+title: "Datos Policiales"
+author: "Jonathan Ugalde"
+date: '2022-06-15'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r paquetes, message=FALSE}
+
+install.packages("ggplot2")
+install.packages("plotly")
+install.packages("dplyr")
+install.packages("DT")
+install.packages("readxl")
+
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(DT)
+library(readxl)
+
+```
+
+```{r lectura de datos}
+datos_policiales <-
+  readxl::read_excel("C:/Users/PC/Documents/2022 UCR I/PROCESAMIENTO DE DATOS/Datos Policiales/datos-policiales/estadisticaspoliciales2021.xls")
+
+```
+
+# TABLA
+
+```{r tabla}
+datos_policiales %>%
+  dplyr::select(Delito, Fecha, Victima, Edad, Genero, Provincia, Canton) %>%
+  datatable()
+
+```
+
