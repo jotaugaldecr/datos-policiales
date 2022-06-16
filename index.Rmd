@@ -16,12 +16,14 @@ install.packages("plotly")
 install.packages("dplyr")
 install.packages("DT")
 install.packages("readxl")
+install.packages("lubridate",dependencies = TRUE)
 
 library(ggplot2)
 library(plotly)
 library(dplyr)
 library(DT)
 library(readxl)
+library(lubridate)
 
 ```
 
@@ -36,7 +38,54 @@ datos_policiales <-
 ```{r tabla}
 datos_policiales %>%
   dplyr::select(Delito, Fecha, Victima, Edad, Genero, Provincia, Canton) %>%
-  datatable()
+  datatable(options = list (pageLength = 100), colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón"))
 
 ```
+
+
+
+
+# Grafico
+
+```{r grafico}
+grafico <-
+datos_policiales %>%
+  count(Delito) %>%
+  ggplot(aes(x = reorder(Delito, n), y = n)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  ggtitle("Registro de Delitos") + 
+  xlab("Delito") +
+  ylab("Cantidad") +
+  theme_minimal()
+
+
+
+ggplotly(grafico) %>% config(locale = 'es')
+
+```
+
+# GRAFICO DELITOS POR MES
+
+
+```{r grafico-delitos}
+datos_policiales %>%
+  ggplot(aes(x = Delito, y = Fecha)) +
+  geom_bar(stat = "identity") +
+  coord_flip() 
+
+```
+
+
+
+# GRAFICO CANTONES
+
+```{r grafico-cantones}
+datos_policiales %>%
+  ggplot(aes(x = Delito, y = Canton)) +
+  geom_bar(stat = "identity") +
+  coord_flip()
+  
+```
+
 
