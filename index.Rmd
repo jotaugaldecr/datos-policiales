@@ -9,14 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r paquetes, message=FALSE}
+```{r packages, message=FALSE}
 
-install.packages("ggplot2")
-install.packages("plotly")
-install.packages("dplyr")
-install.packages("DT")
-install.packages("readxl")
-install.packages("lubridate",dependencies = TRUE)
+
 
 library(ggplot2)
 library(plotly)
