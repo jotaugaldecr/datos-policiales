@@ -1,8 +1,10 @@
 ---
-title: "Datos Policiales"
+title: "**Datos Policiales OIJ**"
 author: "Jonathan Ugalde"
 date: '2022-06-15'
-output: html_document
+output: 
+  html_document: 
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
@@ -22,25 +24,50 @@ library(lubridate)
 
 ```
 
-```{r lectura de datos}
+```{r lectura de datos, message=FALSE}
 datos_policiales <-
   readxl::read_excel("C:/Users/PC/Documents/2022 UCR I/PROCESAMIENTO DE DATOS/Datos Policiales/datos-policiales/estadisticaspoliciales2021.xls")
 
 ```
 
-# TABLA
+### _**TABLA DE DATOS DE DELITOS**_
 
-```{r tabla}
+```{r tabla, message=FALSE, echo=FALSE,warning=FALSE}
 datos_policiales %>%
   dplyr::select(Delito, Fecha, Victima, Edad, Genero, Provincia, Canton) %>%
-  datatable(options = list (pageLength = 100), colnames = c("Delito", "Fecha", "Víctima", "Edad", "Género", "Provincia", "Cantón"))
+  mutate(Fecha = as.Date(Fecha, format = "%d/%m/%Y")) %>%
+  datatable(
+    options = list (
+      pageLength = 50,
+      language = list(url = '//cdn.datatables.net/plug-ins/1.10.11/i18n/Spanish.json')
+    ),
+    colnames = c(
+      "Delito",
+      "Fecha",
+      "Víctima",
+      "Edad",
+      "Género",
+      "Provincia",
+      "Cantón"
+    )
+  )
 
 ```
 
 
 
 
-# Grafico
+
+
+
+
+
+
+
+
+
+
+### _**GRÁFICO DE TIPO DE DELITO**_
 
 ```{r grafico}
 grafico <-
@@ -52,7 +79,7 @@ datos_policiales %>%
   ggtitle("Registro de Delitos") + 
   xlab("Delito") +
   ylab("Cantidad") +
-  theme_minimal()
+  theme_get()
 
 
 
@@ -60,27 +87,109 @@ ggplotly(grafico) %>% config(locale = 'es')
 
 ```
 
-# GRAFICO DELITOS POR MES
 
 
-```{r grafico-delitos}
-datos_policiales %>%
-  ggplot(aes(x = Delito, y = Fecha)) +
-  geom_bar(stat = "identity") +
-  coord_flip() 
+
+
+
+
+
+
+
+
+### _**GRÁFICO DELITOS COMETIDOS POR MES**_
+
+```{r, asignacion de meses, message=FALSE}
+datos_meses <- datos_policiales %>% mutate(fecha_meses = lubridate::month(Fecha))
+orden_meses <-c("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre")
 
 ```
 
 
 
-# GRAFICO CANTONES
+
+```{r, grafico delitos por mes, message=FALSE}
+
+delitos_meses <-
+  
+  datos_meses %>%
+  count(fecha_meses) %>%
+  ggplot(level = level_order, (aes(x = reorder(orden_meses, fecha_meses), y = n))) +
+  geom_bar(stat = "identity") +
+  ggtitle("Cantidad de Delitos por mes") +
+  xlab("Mes") +
+  ylab("Cantidad") +
+  coord_flip() + 
+  theme_dark()
+
+ggplotly(delitos_meses)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+### _**GRÁFICO DE PROPORCIÓN POR GÉNEROS**_
+
+```{r, dato de delitos por genero, message=FALSE}
+
+datos_genero <-
+  datos_policiales %>%
+  ggplot(aes(x = Delito, fill = Genero)) +
+  geom_bar(position = "fill") +
+  ggtitle("Proporcion por género") +
+  xlab("Proporción") +
+  ylab("Género") +
+  coord_flip() +
+  labs(fill = "Género") +
+  theme_classic()
+
+ggplotly(datos_genero)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### _**GRÁFICO DE DELITOS POR CANTONES CENTRALES DEL GAM**_
 
 ```{r grafico-cantones}
-datos_policiales %>%
-  ggplot(aes(x = Delito, y = Canton)) +
-  geom_bar(stat = "identity") +
-  coord_flip()
+datos_canton <-
   
+  datos_policiales %>%
+  count(Canton) %>%
+  filter(Canton == "SAN JOSE" |
+           Canton == "HEREDIA" |
+           Canton == "ALAJUELA" |
+           Canton == "CARTAGO") %>% 
+  
+  ggplot(aes(x = reorder(Canton, n), y = n)) +
+  geom_bar(stat = "identity") +
+  ggtitle("Delitos por Cantón") + 
+  xlab("Cantón") +
+  ylab("Cantidad") +
+  theme_classic()
+
+  ggplotly(datos_canton)
 ```
 
 
